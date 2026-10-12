@@ -28,6 +28,7 @@ function onNavigate() {
       <RouterLink to="/" class="nav-link" @click="onNavigate">главная</RouterLink>
       <RouterLink to="/oscar" class="nav-link" @click="onNavigate">номинации на Оскар</RouterLink>
       <RouterLink to="/top" class="nav-link" @click="onNavigate">мой топ фильмов</RouterLink>
+      <RouterLink to="/roulette" class="nav-link" @click="onNavigate">рандом</RouterLink>
       <RouterLink to="/favorites" class="nav-link" @click="onNavigate">
         <span>избранное</span>
         <span v-if="favoriteCount > 0" class="nav-count">{{ favoriteCount }}</span>
