@@ -1,172 +1,124 @@
 # Skills — Vue 3 + TS + Vite
 
-> Читать перед задачей. После фикса бага (>15 мин) — дописывать в «Баги».
-> Стек: Vue 3 (Composition API, `<script setup>`), TypeScript, Vite, oxlint, oxfmt.
+Читать перед задачей. Стек: Vue 3.5 (`<script setup>`), TypeScript 5.9, Vite, Tailwind 4, oxlint, oxfmt. Менеджер пакетов — npm.
 
-## Карта проекта
+## Карта
 
 - `src/views` — экраны. Собирают данные из composables и передают их вниз.
-- `src/layouts` — оболочка приложения. Может вызывать composables шапки, меню, темы.
-- `src/components` — представление. Не читают `localStorage`, каталог, Telegram. Получают состояние пропсами, сообщают о действиях через `emit` / `defineModel`.
-- `src/composables` — состояние и поведение. Экраны не дублируют эту логику.
+- `src/layouts` — оболочка. Может вызывать composables шапки, меню и темы.
+- `src/components` — представление. Не читают `localStorage`, каталог и Telegram.
+- `src/composables` — состояние и поведение. Один файл — одна зона данных.
 - `src/types` — общие типы.
 - `src/data` — JSON. Читает только `useCatalog`.
-- `src/router` — конфиг роутера.
-- `src/assets` — стили, изображения.
-- `scripts/` — вспомогательные скрипты сборки.
+- `src/router` — hash-роутер (`createWebHashHistory`), чтобы мини-приложение жило на статике.
+- `src/assets` — стили.
+- `scripts/` — генерация постеров и прочие скрипты сборки.
 
----
+## Правила
 
-## Как я работаю
+Компоненты — только `<script setup lang="ts">`. Options API, mixins и `defineComponent` не используются.
 
-1. Перед задачей — просматриваю раздел «Баги» (не повторять).
-2. Перед PR — пробегаю «Правила» и «Best practices».
-3. После фикса бага — запись в «Баги».
-4. После архитектурного решения — запись в «Решения».
+Порядок в скрипте: импорты, props / emits / model, состояние, computed, функции, подписки.
 
-## Definition of Done
+Пропсы: `defineProps<{ ... }>()` или именованный интерфейс, если тип переиспользуется. События: `defineEmits<{ name: [payload] }>()`. Поля формы — `defineModel`. В шаблоне только проверка и вывод; подписи, рейтинг и адреса считаются в `computed` или функциях.
 
-- [ ] `npm run lint` — без ошибок
-- [ ] `npm run fmt` — формат чистый
-- [ ] `npm run typecheck` (`vue-tsc --noEmit`) — типы чистые
-- [ ] Нет `any`, нет `@ts-ignore` без обоснования
-- [ ] Props/emits типизированы (`defineProps<T>()`, `defineEmits<{ name: [payload] }>()`)
-- [ ] Нет `v-if` + `v-for` на одном элементе
-- [ ] Проверено, что не повторяю баг из журнала
+Vue 3.5 сохраняет реактивность при деструктуризации props в `<script setup>`. В этом репозитории props читают через объект `props`, чтобы не смешивать стиль.
 
----
+Корневое состояние — `ref` и `shallowRef`, не `reactive`. Списки — `shallowRef`. Производные значения — `computed`. Поля форм и флаги — `ref`. Composable возвращает объект с явным типом.
 
-## Слои
+Подписки на `window`, `localStorage` и Telegram живут в composable, который владеет данными. Такой composable вызывает один хозяин. Флаги экрана (`exported`, открыто ли меню в пределах одного экрана) остаются в экране.
 
-- `src/views` — экраны. Собирают данные из composables и передают их вниз.
-- `src/layouts` — оболочка приложения. Может вызывать composables шапки, меню и темы.
-- `src/components` — представление. Не читают `localStorage`, каталог и Telegram. Получают состояние пропсами, сообщают о действиях через `emit` или `defineModel`.
-- `src/composables` — состояние и поведение. Экраны не дублируют эту логику у себя.
-- `src/types` — общие типы.
-- `src/data` — JSON. Его читает только `useCatalog`.
+Каталог и «Мои рекомендации» проверяются в `useCatalog` на границе JSON. Тема — только `useTheme`, ключ `iran-cinema-theme` (тот же ключ в инлайн-скрипте `index.html`). Избранное — только `useFavorites`, ключ `iran-cinema-favorites`; шаринг в Telegram входит в эту зону. Имя аккаунта читает `useTelegram`. Если пользователя нет, на экране «Гость». Внешние ссылки открывает `useExternalLink`.
 
-## Компоненты
+`strict: true`. На границах (`JSON.parse`, `localStorage`) тип — `unknown`, не `any`. `@ts-ignore` без причины не ставить. `verbatimModuleSyntax`: типы импортируются через `import type`. `erasableSyntaxOnly`: `enum` не использовать, вместо него `as const`.
 
-- Только `<script setup lang="ts">`. Options API, mixins и `defineComponent` не используются.
-- Пропсы описываются интерфейсом и `defineProps<Props>()`.
-- События: `defineEmits<{ name: [payload] }>()`.
-- Двусторонние поля формы — через `defineModel`.
-- В шаблоне нет ветвлений сложнее проверки и вывода. Подписи, рейтинги и адреса считаются в `computed` или функциях скрипта.
-- Корневое состояние компонента не объявляется через `reactive`.
+Свои CSS-классы (`.btn`, `.card`, `.nav-link`) лежат в `@layer components`. Иначе они перекрывают утилиты Tailwind, включая `md:hidden`.
 
-### Порядок блоков в `<script setup>`
+Dev-сервер слушает `127.0.0.1`. Без `server.host` Vite на Windows поднимается только на IPv6, и браузер по `127.0.0.1` его не видит.
 
-1. `import` (сначала внешние, потом внутренние)
-2. `defineOptions` (если нужен `name`)
-3. `defineProps` / `defineEmits` / `defineSlots`
-4. `defineModel`
-5. `ref` / `shallowRef`
-6. `computed`
-7. `watch` / `watchEffect`
-8. функции
-9. lifecycle (`onMounted`, `onUnmounted`)
-10. `defineExpose` (редко)
+Экспорт в Telegram идёт через `Telegram.WebApp.openTelegramLink`. Вне Telegram — `window.open(..., '_blank')`. Переход текущей вкладки на `t.me` из мини-приложения не используется.
 
-## Composables
+Сети в приложении нет. Если появится запрос, отменять его через `AbortController` и держать явные `isLoading` и `error`.
 
-- Файл называется `use*.ts`, функция — `use*`. Один файл — одна задача.
-- Общее состояние живёт в модульных `ref` и `shallowRef`, чтобы каждый вызов делил один источник.
-- Списки — в `shallowRef`. Производные значения — в `computed`. Поля форм и флаги — в `ref`.
-- Функция возвращает объект с явным типом.
-- `onMounted`, `onUnmounted` и `watch` ставятся внутри composable, который владеет этим состоянием.
-- Composable с подпиской на жизненный цикл вызывается одним хозяином.
-- `any` не используется.
+## Готово, когда
 
-## Данные и постоянство
-
-- Каталог и «Мои рекомендации» загружаются в `useCatalog` и проверяются на границе JSON.
-- Тема пишется только в `useTheme`, ключ `iran-cinema-theme`.
-- Избранное пишется только в `useFavorites`, ключ `iran-cinema-favorites`.
-- Имя аккаунта Telegram читает `useTelegram`.
-- Переход по внешней ссылке и экспорт списка в Telegram делают `useExternalLink` и `useFavorites`.
-
-## TypeScript
-
-- `strict: true`, `noUncheckedIndexedAccess: true`.
-- `unknown` вместо `any` на границах (API, JSON.parse, postMessage).
-- DTO с бэка — валидировать на границе.
-- `enum` не использовать — `as const` объекты + `typeof`.
-- Индексные типы — `Record<string, T>`, не `{ [k: string]: T }`.
-
-## Асинхронность
-
-- Всегда `try/catch` или `.catch()`.
-- Отмена запросов при unmount через `AbortController`.
-- Явный `isLoading` / `error`, не «магические» флаги.
+- `npm run lint` без ошибок
+- `npm run fmt:check` чистый
+- `npx vue-tsc -b --pretty false` без ошибок (тот же шаг, что в `npm run build`)
+- нет `any` и `@ts-ignore` без причины
+- нет `v-if` и `v-for` на одном элементе
 
 ## Инструменты
 
-### oxlint (`.oxlintrc.json`)
+oxlint, `.oxlintrc.json`: плагины `typescript`, `unicorn`, `oxc`, `vue`. Категория `correctness: "error"`. `rules` пустой — новое правило добавлять точечно и сразу упоминать здесь. env: `builtin`, `browser`, `node`. Игнор: `dist`, `public`. Запуск: `npm run lint`.
 
-- Плагины: `typescript`, `unicorn`, `oxc`, `vue`.
-- Категории: `correctness: "error"`. Остальные категории выключены.
-- `rules: {}` — набор правил пуст; новые правила добавлять точечно и осознанно.
-- env: `builtin`, `browser`, `node`.
-- Игнор: `dist`, `public`.
-- Запуск: `npm run lint`.
+oxfmt, `.oxfmtrc.json`: одинарные кавычки, без точек с запятой, ширина строки 100. Игнор: `dist`, `public`. Запись: `npm run fmt`. Проверка: `npm run fmt:check`.
 
-### oxfmt (`.oxfmtrc.json`)
-
-- Стиль: **single quotes**, **без точек с запятой**, ширина строки **100**.
-- Игнор: `dist`, `public`.
-- Запуск: `npm run fmt` (форматирование). Для проверки без записи — `npx oxfmt --check`.
-
-### Прочее
-
-- Не добавлять ESLint/Prettier — дублирование и конфликты с oxlint/oxfmt.
-- Новое правило линтера — сначала в `.oxlintrc.json`, потом упомянуть здесь.
-- Проверка типов — `vue-tsc --noEmit` (добавить в `package.json` как `typecheck`, если ещё нет).
+ESLint и Prettier не добавлять.
 
 ## Запуск
 
-`pnpm install`
-`pnpm run dev`
-`pnpm run lint`
-`pnpm run fmt`
-`pnpm run build`
-
----
+```
+npm install
+npm run dev
+npm run lint
+npm run fmt
+npm run build
+```
 
 ## Баги
 
-> Шаблон:
->
-> ### [BUG-XXX] Заголовок
->
-> **Симптом:**
-> **Плохо:**
-> **Хорошо:**
-> **Причина:**
-> **Правило:**
-> **Теги:**
+Шаблон:
 
-### [BUG-001] Деструктуризация props теряет реактивность
+### [BUG-XXX] Заголовок
 
-**Симптом:** значение в шаблоне не обновляется при изменении prop.
-**Плохо:** `const { title } = defineProps<{ title: string }>()`
-**Хорошо:** `const props = defineProps<...>()` + `props.title`.
-**Причина:** деструктуризация забирает значение, а не ссылку.
-**Правило:** props не деструктурировать.
-**Теги:** #reactivity #props
+**Симптом:**
+**Плохо:**
+**Хорошо:**
+**Причина:**
+**Правило:**
+**Теги:**
 
-### [BUG-002] `watch` не видит вложенное изменение
+Сюда попадает повтор, который следующий проход по коду может сделать снова. Общие заметки по Vue — в конце файла, не в журнале.
 
-**Симптом:** изменение `state.user.name` не триггерит watch.
-**Фикс:** `watch(() => state.user.name, cb)` или `{ deep: true }` осознанно.
-**Правило:** watch на примитив, если возможно.
-**Теги:** #watch #reactivity
+### [BUG-001] Класс кнопки перекрывает `md:hidden`
 
-### [BUG-003] Утечка listener
+**Симптом:** кнопка «Категории» видна на широком экране, хотя на ней стоит `md:hidden`.
+**Плохо:** `.btn { display: inline-flex }` вне слоя, рядом с утилитой Tailwind.
+**Хорошо:** те же классы внутри `@layer components` в `src/assets/main.css`.
+**Причина:** неслойный CSS побеждает `@layer utilities` независимо от порядка в разметке.
+**Правило:** свои классы писать в `@layer components`.
+**Теги:** #css #tailwind
 
-**Симптом:** компонент жив после unmount.
-**Фикс:**
+### [BUG-002] Vite на Windows не открывается по `127.0.0.1`
+
+**Симптом:** `npm run dev` пишет, что сервер готов, браузер показывает ошибку сети.
+**Плохо:** `defineConfig` без `server.host`. Процесс слушает только `[::1]:5173`.
+**Хорошо:** `server: { host: '127.0.0.1', port: 5173 }` в `vite.config.ts`.
+**Причина:** на Windows `localhost` у Vite уходит в IPv6, а часть клиентов ходит на IPv4.
+**Правило:** dev-сервер явно слушает `127.0.0.1`.
+**Теги:** #vite #windows
+
+### [BUG-003] Экспорт избранного уводит из мини-приложения
+
+**Симптом:** после «Экспорт в избранное Telegram» текущая вкладка открывает `t.me`, текст успеха пропадает.
+**Плохо:** программно кликнуть `<a href="https://t.me/share/url?...">` без новой вкладки.
+**Хорошо:** в Telegram — `WebApp.openTelegramLink`. Вне Telegram — `window.open(url, '_blank', 'noopener,noreferrer')` и успех только если окно открылось.
+**Причина:** шаринг должен оставить мини-приложение на месте.
+**Правило:** экспорт не навигирует текущий документ.
+**Теги:** #telegram #favorites
+
+## Заметки по Vue 3.5
+
+Это не баги репозитория.
+
+`watch` на объект не видит вложенное поле. Следить за примитивом: `watch(() => state.user.name, cb)`. `{ deep: true }` — только когда нужна вся глубина.
+
+Слушатель `window` снимать в паре с установкой:
 
 ```ts
 onMounted(() => window.addEventListener('resize', onResize))
 onUnmounted(() => window.removeEventListener('resize', onResize))
 ```
+
+Деструктуризация `reactive()` без `toRefs` отрывает значение от источника. К props в `<script setup>` на Vue 3.5 это не относится.
