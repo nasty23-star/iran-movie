@@ -17,6 +17,13 @@ export interface UseCatalog {
 const films = shallowRef(parseList(catalogJson, parseFilm))
 const recommendations = shallowRef(parseList(recommendationsJson, parseRecommendation))
 
+export const catalogFilmIds = computed(() => {
+  const known = new Set<string>()
+  for (const film of films.value) known.add(film.id)
+  for (const film of recommendations.value) known.add(film.id)
+  return known
+})
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }

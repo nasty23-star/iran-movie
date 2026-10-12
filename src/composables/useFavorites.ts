@@ -1,5 +1,6 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { ComputedRef } from 'vue'
+import { catalogFilmIds } from '@/composables/useCatalog'
 import type { FilmCardModel } from '@/types/film'
 
 export interface UseFavorites {
@@ -12,6 +13,17 @@ export interface UseFavorites {
 
 const STORAGE_KEY = 'iran-cinema-favorites'
 const ids = ref<string[]>(readIds())
+
+watch(
+  catalogFilmIds,
+  (known) => {
+    const next = ids.value.filter((id) => known.has(id))
+    if (next.length === ids.value.length) return
+    ids.value = next
+    persist()
+  },
+  { immediate: true },
+)
 
 function readIds(): string[] {
   try {

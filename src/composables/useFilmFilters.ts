@@ -7,6 +7,7 @@ export interface UseFilmFilters {
   year: Ref<string>
   director: Ref<string>
   genre: Ref<string>
+  active: ComputedRef<boolean>
   filtered: ComputedRef<Film[]>
   reset: () => void
 }
@@ -16,6 +17,13 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
   const year = ref('')
   const director = ref('')
   const genre = ref('')
+  const active = computed(
+    () =>
+      query.value.trim().length > 0 ||
+      year.value !== '' ||
+      director.value !== '' ||
+      genre.value !== '',
+  )
 
   const filtered = computed(() => {
     const needle = query.value.trim().toLocaleLowerCase('ru')
@@ -40,5 +48,5 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
     genre.value = ''
   }
 
-  return { query, year, director, genre, filtered, reset }
+  return { query, year, director, genre, active, filtered, reset }
 }
