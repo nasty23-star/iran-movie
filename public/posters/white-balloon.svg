@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Белый шар">
+  <rect width="400" height="600" fill="#f5f7f9"/>
+  <circle cx="134" cy="141" r="170" fill="#f5f7f9"/>
+  <path d="M0 215 L400 145 L400 324 L0 374 Z" fill="#d5dee6" opacity="0.88"/>
+  <rect x="28" y="448" width="230" height="8" fill="#d5dee6"/>
+  <text x="28" y="545" fill="#0b1a30" font-family="Georgia, serif" font-size="54">1995</text>
+  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#0b1a30" stroke-opacity="0.35" stroke-width="2"/>
+</svg>

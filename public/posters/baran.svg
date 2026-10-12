@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Баран">
+  <rect width="400" height="600" fill="#102848"/>
+  <circle cx="61" cy="169" r="115" fill="#1d5aa3"/>
+  <path d="M0 227 L400 157 L400 335 L0 385 Z" fill="#78b0e6" opacity="0.88"/>
+  <rect x="28" y="448" width="193" height="8" fill="#3c4a58"/>
+  <text x="28" y="545" fill="#0b1a30" font-family="Georgia, serif" font-size="54">2001</text>
+  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#0b1a30" stroke-opacity="0.35" stroke-width="2"/>
+</svg>
