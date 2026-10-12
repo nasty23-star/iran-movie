@@ -27,6 +27,6 @@ function onRemove() {
       <h2 class="truncate font-display text-xl">{{ film.title }}</h2>
       <p class="text-sm text-muted">{{ film.year }} · IMDb {{ rating }}</p>
     </div>
-    <button type="button" class="btn btn-danger" @click="onRemove">удалив</button>
+    <button type="button" class="btn btn-danger" @click="onRemove">удалить</button>
   </li>
 </template>

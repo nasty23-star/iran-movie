@@ -65,7 +65,7 @@
 :root[data-theme='dark'] {
   --canvas: var(--black);
   --wash: var(--blue-900);
-  --surface: #141b26;
+  --surface: #202123;
   --surface-2: var(--gray-800);
   --ink: var(--gray-50);
   --muted: var(--gray-400);

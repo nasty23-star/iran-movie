@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Герой">
-  <rect width="400" height="600" fill="#07090c"/>
-  <circle cx="252" cy="200" r="120" fill="#102848"/>
-  <path d="M0 183 L400 113 L400 350 L0 400 Z" fill="#1a2129" opacity="0.88"/>
-  <rect x="28" y="448" width="149" height="8" fill="#102848"/>
-  <text x="28" y="545" fill="#f5f7f9" font-family="Georgia, serif" font-size="54">2021</text>
-  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#f5f7f9" stroke-opacity="0.35" stroke-width="2"/>
-</svg>

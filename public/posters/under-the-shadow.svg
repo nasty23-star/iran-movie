@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Под тенью">
-  <rect width="400" height="600" fill="#78b0e6"/>
-  <circle cx="100" cy="287" r="161" fill="#a9cef2"/>
-  <path d="M0 252 L400 182 L400 380 L0 430 Z" fill="#184882" opacity="0.88"/>
-  <rect x="28" y="448" width="246" height="8" fill="#4c91d6"/>
-  <text x="28" y="545" fill="#f5f7f9" font-family="Georgia, serif" font-size="54">2016</text>
-  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#f5f7f9" stroke-opacity="0.35" stroke-width="2"/>
-</svg>

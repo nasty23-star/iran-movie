@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Цвет рая">
-  <rect width="400" height="600" fill="#d5dee6"/>
-  <circle cx="67" cy="82" r="157" fill="#3c4a58"/>
-  <path d="M0 185 L400 115 L400 347 L0 397 Z" fill="#2b72c4" opacity="0.88"/>
-  <rect x="28" y="448" width="95" height="8" fill="#102848"/>
-  <text x="28" y="545" fill="#0b1a30" font-family="Georgia, serif" font-size="54">1999</text>
-  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#0b1a30" stroke-opacity="0.35" stroke-width="2"/>
-</svg>

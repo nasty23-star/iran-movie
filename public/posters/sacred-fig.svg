@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Семя священного инжира">
-  <rect width="400" height="600" fill="#78b0e6"/>
-  <circle cx="297" cy="208" r="159" fill="#102848"/>
-  <path d="M0 232 L400 162 L400 352 L0 402 Z" fill="#0b1a30" opacity="0.88"/>
-  <rect x="28" y="448" width="216" height="8" fill="#1d5aa3"/>
-  <text x="28" y="545" fill="#f5f7f9" font-family="Georgia, serif" font-size="54">2024</text>
-  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#f5f7f9" stroke-opacity="0.35" stroke-width="2"/>
-</svg>
