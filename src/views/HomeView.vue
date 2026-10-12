@@ -6,8 +6,8 @@ import { useExternalLink } from '@/composables/useExternalLink'
 import { useFavorites } from '@/composables/useFavorites'
 import { useFilmFilters } from '@/composables/useFilmFilters'
 
-const { films, years, directors } = useCatalog()
-const { query, year, director, filtered, reset } = useFilmFilters(films)
+const { films, years, directors, genres } = useCatalog()
+const { query, year, director, genre, filtered, reset } = useFilmFilters(films)
 const { isSaved, toggle } = useFavorites()
 const { openExternal } = useExternalLink()
 </script>
@@ -17,7 +17,7 @@ const { openExternal } = useExternalLink()
     <div>
       <h1 class="font-display text-4xl">Каталог</h1>
       <p class="mt-2 max-w-2xl text-muted">
-        Поиск по названию, год и режиссёр. На карточке — постер, название, год, рейтинг IMDb и
+        Поиск по названию, год, режиссёр и жанр. На карточке — постер, название, год, рейтинг IMDb и
         ссылка на фильм.
       </p>
     </div>
@@ -25,8 +25,10 @@ const { openExternal } = useExternalLink()
       v-model:query="query"
       v-model:year="year"
       v-model:director="director"
+      v-model:genre="genre"
       :years="years"
       :directors="directors"
+      :genres="genres"
       @reset="reset"
     />
     <p class="text-sm text-muted">Найдено фильмов: {{ filtered.length }}</p>

@@ -9,6 +9,7 @@ export interface UseCatalog {
   recommendations: ShallowRef<Recommendation[]>
   years: ComputedRef<number[]>
   directors: ComputedRef<string[]>
+  genres: ComputedRef<string[]>
   oscarFilms: ComputedRef<Film[]>
   findById: (id: string) => FilmCardModel | undefined
 }
@@ -35,6 +36,13 @@ function readBoolean(record: Record<string, unknown>, key: string): boolean | nu
   return typeof value === 'boolean' ? value : null
 }
 
+function readGenres(record: Record<string, unknown>): string[] | null {
+  const value = record.genres
+  if (!Array.isArray(value) || value.length === 0) return null
+  const genres = value.filter((item): item is string => typeof item === 'string' && item.length > 0)
+  return genres.length === value.length ? genres : null
+}
+
 function parseList<T>(input: unknown, parse: (value: unknown) => T | null): T[] {
   if (!Array.isArray(input)) return []
   return input.flatMap((item) => {
@@ -53,6 +61,7 @@ function parseFilm(value: unknown): Film | null {
   const imdbRating = readNumber(value, 'imdbRating')
   const imdbId = readString(value, 'imdbId')
   const image = readString(value, 'image')
+  const genres = readGenres(value)
   const oscarNominated = readBoolean(value, 'oscarNominated')
   if (
     id === null ||
@@ -63,6 +72,7 @@ function parseFilm(value: unknown): Film | null {
     imdbRating === null ||
     imdbId === null ||
     image === null ||
+    genres === null ||
     oscarNominated === null
   ) {
     return null
@@ -77,6 +87,7 @@ function parseFilm(value: unknown): Film | null {
     imdbRating,
     imdbId,
     image,
+    genres,
     oscarNominated,
   }
   const oscarNote = value.oscarNote
@@ -123,6 +134,12 @@ export function useCatalog(): UseCatalog {
     ),
   )
 
+  const genres = computed(() =>
+    [...new Set(films.value.flatMap((film) => film.genres))].toSorted((left, right) =>
+      left.localeCompare(right, 'ru'),
+    ),
+  )
+
   const oscarFilms = computed(() =>
     films.value
       .filter((film) => film.oscarNominated)
@@ -136,5 +153,5 @@ export function useCatalog(): UseCatalog {
     )
   }
 
-  return { films, recommendations, years, directors, oscarFilms, findById }
+  return { films, recommendations, years, directors, genres, oscarFilms, findById }
 }

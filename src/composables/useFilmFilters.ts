@@ -6,6 +6,7 @@ export interface UseFilmFilters {
   query: Ref<string>
   year: Ref<string>
   director: Ref<string>
+  genre: Ref<string>
   filtered: ComputedRef<Film[]>
   reset: () => void
 }
@@ -14,6 +15,7 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
   const query = ref('')
   const year = ref('')
   const director = ref('')
+  const genre = ref('')
 
   const filtered = computed(() => {
     const needle = query.value.trim().toLocaleLowerCase('ru')
@@ -23,7 +25,8 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
           needle.length === 0 || film.title.toLocaleLowerCase('ru').includes(needle)
         const matchesYear = year.value === '' || film.year === Number(year.value)
         const matchesDirector = director.value === '' || film.director === director.value
-        return matchesQuery && matchesYear && matchesDirector
+        const matchesGenre = genre.value === '' || film.genres.includes(genre.value)
+        return matchesQuery && matchesYear && matchesDirector && matchesGenre
       })
       .toSorted(
         (left, right) => right.year - left.year || left.title.localeCompare(right.title, 'ru'),
@@ -34,7 +37,8 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
     query.value = ''
     year.value = ''
     director.value = ''
+    genre.value = ''
   }
 
-  return { query, year, director, filtered, reset }
+  return { query, year, director, genre, filtered, reset }
 }

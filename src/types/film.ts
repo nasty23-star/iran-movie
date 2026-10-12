@@ -7,11 +7,13 @@ export interface FilmCardModel {
   imdbRating: number
   imdbId: string
   image: string
+  genres?: string[]
   note?: string
   oscarNote?: string
 }
 
 export interface Film extends FilmCardModel {
+  genres: string[]
   oscarNominated: boolean
 }
 

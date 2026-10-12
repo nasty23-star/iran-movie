@@ -15,6 +15,11 @@ const emit = defineEmits<{
 }>()
 
 const rating = computed(() => props.film.imdbRating.toFixed(1))
+const meta = computed(() => {
+  const genres = props.film.genres
+  if (!genres || genres.length === 0) return String(props.film.year)
+  return `${props.film.year} · ${genres.join(', ')}`
+})
 const href = computed(() => imdbUrl(props.film.imdbId))
 const savedLabel = computed(() => (props.saved ? 'В избранном' : 'В избранное'))
 
@@ -35,7 +40,7 @@ function onOpen(event: MouseEvent) {
         <h2 class="font-display text-xl leading-tight">{{ film.title }}</h2>
         <p class="rating">IMDb {{ rating }}</p>
       </div>
-      <p class="text-sm text-muted">{{ film.year }}</p>
+      <p class="text-sm text-muted">{{ meta }}</p>
       <div class="mt-auto flex flex-wrap items-center gap-2">
         <a
           :href="href"
