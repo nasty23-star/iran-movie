@@ -1,6 +1,18 @@
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import type { ComputedRef } from 'vue'
 import { catalogFilmIds } from '@/composables/useCatalog'
+import { imdbUrl } from '@/composables/useExternalLink'
+import {
+  bootIdCloudList,
+  bootNoteCloudList,
+  cleanNote,
+  commitIdCloudList,
+  commitNoteCloudList,
+  createIdCloudList,
+  createNoteCloudList,
+  pruneIdCloudList,
+  pruneNoteCloudList,
+} from '@/composables/idCloud'
 import type { FilmCardModel } from '@/types/film'
 
 export interface UseFavorites {
@@ -8,49 +20,54 @@ export interface UseFavorites {
   isSaved: (id: string) => boolean
   toggle: (id: string) => void
   remove: (id: string) => void
+  restore: (id: string, note: string) => void
+  noteOf: (id: string) => string
+  setNote: (id: string, value: string) => void
   shareFavorites: (films: FilmCardModel[]) => boolean
+  shareFilm: (film: FilmCardModel) => boolean
 }
 
-const STORAGE_KEY = 'iran-cinema-favorites'
-const ids = ref<string[]>(readIds())
+const IDS_KEY = 'iran-cinema-favorites'
+const NOTES_KEY = 'iran-cinema-favorite-notes'
+const saved = createIdCloudList(IDS_KEY)
+const noteList = createNoteCloudList(NOTES_KEY)
 
 watch(
   catalogFilmIds,
   (known) => {
-    const next = ids.value.filter((id) => known.has(id))
-    if (next.length === ids.value.length) return
-    ids.value = next
-    persist()
+    pruneIdCloudList(saved, known)
+    pruneNoteCloudList(noteList, (id) => known.has(id), false)
   },
   { immediate: true },
 )
 
-function readIds(): string[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter((item): item is string => typeof item === 'string')
-  } catch {
-    return []
-  }
+let savedReady = false
+let notesReady = false
+
+function settleNotes() {
+  if (!savedReady || !notesReady) return
+  pruneNoteCloudList(noteList, (id) => saved.ids.value.includes(id), true)
 }
 
-function persist() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.value))
-  } catch {
-    // Список остаётся в памяти, если хранилище недоступно.
-  }
+bootIdCloudList(
+  saved,
+  () => catalogFilmIds.value,
+  () => {
+    savedReady = true
+    settleNotes()
+  },
+)
+bootNoteCloudList(noteList, () => {
+  notesReady = true
+  settleNotes()
+})
+
+function filmLine(film: FilmCardModel): string {
+  return `${film.title} (${film.year}), IMDb ${film.imdbRating.toFixed(1)} — ${imdbUrl(film.imdbId)}`
 }
 
 function shareText(films: FilmCardModel[]): string {
-  const lines = films.map(
-    (film) =>
-      `${film.title} (${film.year}), IMDb ${film.imdbRating.toFixed(1)} — https://www.imdb.com/title/${film.imdbId}/`,
-  )
-  return ['Иранское кино. Избранное', ...lines].join('\n')
+  return ['Иранское кино. Избранное', ...films.map((film) => filmLine(film))].join('\n')
 }
 
 function openShare(url: string): boolean {
@@ -64,26 +81,56 @@ function openShare(url: string): boolean {
 }
 
 export function useFavorites(): UseFavorites {
-  const savedIds = computed(() => ids.value)
+  const savedIds = computed(() => saved.ids.value)
 
   function isSaved(id: string) {
-    return ids.value.includes(id)
+    return saved.ids.value.includes(id)
   }
 
   function add(id: string) {
     if (isSaved(id)) return
-    ids.value = [...ids.value, id]
-    persist()
+    commitIdCloudList(saved, [...saved.ids.value, id], true)
   }
 
   function remove(id: string) {
-    ids.value = ids.value.filter((item) => item !== id)
-    persist()
+    if (!isSaved(id)) return
+    commitIdCloudList(
+      saved,
+      saved.ids.value.filter((item) => item !== id),
+      true,
+    )
+    if (!noteList.notes.value[id]) return
+    const next = { ...noteList.notes.value }
+    delete next[id]
+    commitNoteCloudList(noteList, next, true)
   }
 
   function toggle(id: string) {
     if (isSaved(id)) remove(id)
     else add(id)
+  }
+
+  function restore(id: string, note: string) {
+    if (!catalogFilmIds.value.has(id)) return
+    if (!isSaved(id)) commitIdCloudList(saved, [...saved.ids.value, id], true)
+    const text = cleanNote(note)
+    if (text.length === 0) return
+    setNote(id, text)
+  }
+
+  function noteOf(id: string) {
+    return noteList.notes.value[id] ?? ''
+  }
+
+  function setNote(id: string, value: string) {
+    if (!isSaved(id)) return
+    const text = cleanNote(value)
+    const current = noteList.notes.value[id] ?? ''
+    if (text === current) return
+    const next = { ...noteList.notes.value }
+    if (text.length === 0) delete next[id]
+    else next[id] = text
+    commitNoteCloudList(noteList, next, true)
   }
 
   function shareFavorites(films: FilmCardModel[]): boolean {
@@ -95,5 +142,23 @@ export function useFavorites(): UseFavorites {
     return openShare(`https://t.me/share/url?${params.toString()}`)
   }
 
-  return { savedIds, isSaved, toggle, remove, shareFavorites }
+  function shareFilm(film: FilmCardModel): boolean {
+    const params = new URLSearchParams({
+      url: imdbUrl(film.imdbId),
+      text: filmLine(film),
+    })
+    return openShare(`https://t.me/share/url?${params.toString()}`)
+  }
+
+  return {
+    savedIds,
+    isSaved,
+    toggle,
+    remove,
+    restore,
+    noteOf,
+    setNote,
+    shareFavorites,
+    shareFilm,
+  }
 }

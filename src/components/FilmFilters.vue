@@ -6,6 +6,7 @@ const yearFrom = defineModel<string>('yearFrom', { required: true })
 const yearTo = defineModel<string>('yearTo', { required: true })
 const director = defineModel<string>('director', { required: true })
 const genre = defineModel<string>('genre', { required: true })
+const hideWatched = defineModel<boolean>('hideWatched', { required: true })
 
 const props = defineProps<{
   years: number[]
@@ -86,6 +87,10 @@ watch(yearFrom, (value) => {
         <option value="">Все жанры</option>
         <option v-for="item in genres" :key="item" :value="item">{{ item }}</option>
       </select>
+    </label>
+    <label class="flex items-center gap-3 self-end text-sm" for="film-hide-watched">
+      <input id="film-hide-watched" v-model="hideWatched" class="size-4" type="checkbox" />
+      <span>Скрыть просмотренное</span>
     </label>
     <button type="button" class="btn btn-secondary" @click="onReset">Сбросить фильтры</button>
   </div>

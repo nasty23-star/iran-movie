@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import FavoritesView from '@/views/FavoritesView.vue'
+import FilmView from '@/views/FilmView.vue'
 import HomeView from '@/views/HomeView.vue'
 import OscarView from '@/views/OscarView.vue'
 import RouletteView from '@/views/RouletteView.vue'
@@ -12,6 +13,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/top', name: 'top', component: TopView },
   { path: '/roulette', name: 'roulette', component: RouletteView },
   { path: '/favorites', name: 'favorites', component: FavoritesView },
+  { path: '/film/:id', name: 'film', component: FilmView },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 

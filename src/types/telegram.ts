@@ -39,6 +39,11 @@ export interface TelegramSafeAreaInset {
   right: number
 }
 
+export interface TelegramCloudStorage {
+  getItem: (key: string, callback: (error: string | null, value?: string) => void) => void
+  setItem: (key: string, value: string, callback?: (error: string | null) => void) => void
+}
+
 export interface TelegramWebApp {
   ready: () => void
   expand: () => void
@@ -56,6 +61,7 @@ export interface TelegramWebApp {
   setBottomBarColor?: (color: string) => void
   openTelegramLink?: (url: string) => void
   openLink?: (url: string) => void
+  CloudStorage?: TelegramCloudStorage
   BackButton?: TelegramBackButton
   MainButton?: TelegramMainButton
 }

@@ -9,7 +9,7 @@ export interface UseRoulette {
   current: ShallowRef<Film | null>
   notice: Ref<string>
   hint: ComputedRef<string>
-  spin: () => void
+  spin: (pool: readonly Film[]) => void
 }
 
 interface Taste {
@@ -40,22 +40,29 @@ export function useRoulette(): UseRoulette {
     return 'Шанс был ниже: с избранным мало общего.'
   })
 
-  function spin() {
-    const excluded = new Set([...watchedIds.value, ...blockedIds.value])
-    let pool = films.value.filter((film) => !excluded.has(film.id))
+  function spin(pool: readonly Film[]) {
     if (pool.length === 0) {
+      current.value = null
+      notice.value = 'Сейчас нечего предложить.'
+      return
+    }
+    const excluded = new Set([...watchedIds.value, ...blockedIds.value])
+    let available = pool.filter((film) => !excluded.has(film.id))
+    if (available.length === 0) {
+      current.value = null
       notice.value = 'Просмотренное и чёрный список закрыли весь каталог.'
       return
     }
-    if (lastId.value && pool.some((film) => film.id !== lastId.value)) {
-      pool = pool.filter((film) => film.id !== lastId.value)
-    } else if (pool.length === 1 && pool[0]?.id === lastId.value) {
+    if (lastId.value && available.some((film) => film.id !== lastId.value)) {
+      available = available.filter((film) => film.id !== lastId.value)
+    } else if (available.length === 1 && available[0]?.id === lastId.value) {
       notice.value = 'Подряд тот же фильм не предлагаем, а других сейчас нет.'
       return
     }
 
-    const picked = pickWeighted(pool, taste.value, Math.random)
+    const picked = pickWeighted(available, taste.value, Math.random)
     if (!picked) {
+      current.value = null
       notice.value = 'Сейчас нечего предложить.'
       return
     }
@@ -88,7 +95,7 @@ function filmWeight(film: Film, taste: Taste) {
   return score
 }
 
-function pickWeighted(pool: Film[], taste: Taste, random: () => number): Film | null {
+function pickWeighted(pool: readonly Film[], taste: Taste, random: () => number): Film | null {
   if (pool.length === 0) return null
   const weights = pool.map((film) => filmWeight(film, taste))
   const total = weights.reduce((sum, weight) => sum + weight, 0)

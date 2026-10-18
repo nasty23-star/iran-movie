@@ -9,7 +9,7 @@ export default defineConfig({
     port: 5173,
   },
   plugins: [vue(), tailwindcss()],
-  base: "/iran-movie/",
+  base: '/iran-movie/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
