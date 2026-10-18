@@ -60,6 +60,10 @@
   --sidebar-active: var(--blue-700);
   --danger: #8d3b3b;
   --shadow: 0 16px 40px rgb(16 40 72 / 8%);
+  --app-safe-top: 0px;
+  --app-safe-right: 0px;
+  --app-safe-bottom: 0px;
+  --app-safe-left: 0px;
 }
 
 :root[data-theme='dark'] {
@@ -87,14 +91,16 @@ html {
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   background: radial-gradient(920px 420px at 0% -12%, var(--wash), transparent 58%), var(--canvas);
   color: var(--ink);
   font-family: var(--font-sans);
 }
 
 #app {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 :focus-visible {
@@ -192,32 +198,97 @@ body {
     font-weight: 700;
   }
 
-  .sidebar {
-    position: fixed;
-    inset-block: 0;
-    left: 0;
-    z-index: 40;
+  .app-shell {
     display: flex;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: var(--app-safe-top);
+    padding-right: var(--app-safe-right);
+    padding-left: var(--app-safe-left);
+  }
+
+  .shell-main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.5rem 1rem calc(3.25rem + var(--app-safe-bottom) + 0.75rem);
+  }
+
+  .sidebar {
+    display: none;
     width: 18rem;
+    flex-shrink: 0;
     flex-direction: column;
     overflow-y: auto;
     background: var(--sidebar);
     color: var(--sidebar-ink);
-    transform: translateX(-100%);
-    transition: transform 180ms ease;
   }
 
-  .sidebar.is-open {
-    transform: translateX(0);
+  .tab-bar {
+    position: fixed;
+    z-index: 30;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    padding-right: var(--app-safe-right);
+    padding-bottom: var(--app-safe-bottom);
+    padding-left: var(--app-safe-left);
+  }
+
+  .tab-link {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.25rem;
+    padding: 0.35rem 0.15rem;
+    color: var(--muted);
+    font-size: clamp(0.62rem, 2.7vw, 0.75rem);
+    font-weight: 650;
+    line-height: 1.15;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .tab-link.router-link-exact-active {
+    color: var(--accent);
+  }
+
+  .tab-count {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.15rem;
+    min-width: 1.1rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.05rem 0.3rem;
+    font-size: 0.65rem;
   }
 
   @media (min-width: 768px) {
+    .app-shell {
+      flex-direction: row;
+    }
+
+    .shell-main {
+      padding: 1.5rem 2rem 2rem;
+    }
+
     .sidebar {
-      position: sticky;
-      top: 0;
-      z-index: auto;
-      height: 100dvh;
-      transform: none;
+      display: flex;
+    }
+
+    .tab-bar {
+      display: none;
     }
   }
 
@@ -252,9 +323,14 @@ body {
 
   .gate {
     display: flex;
-    min-height: 100dvh;
+    box-sizing: border-box;
+    height: 100%;
     flex-direction: column;
-    padding: 1.25rem;
+    overflow: auto;
+    padding-top: calc(1.25rem + var(--app-safe-top));
+    padding-right: calc(1.25rem + var(--app-safe-right));
+    padding-bottom: calc(1.25rem + var(--app-safe-bottom));
+    padding-left: calc(1.25rem + var(--app-safe-left));
   }
 
   .gate-body {

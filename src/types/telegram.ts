@@ -32,6 +32,13 @@ export interface TelegramMainButton {
   offClick: (callback: () => void) => TelegramMainButton
 }
 
+export interface TelegramSafeAreaInset {
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
 export interface TelegramWebApp {
   ready: () => void
   expand: () => void
@@ -40,6 +47,13 @@ export interface TelegramWebApp {
   initDataUnsafe: {
     user?: TelegramUser
   }
+  safeAreaInset?: TelegramSafeAreaInset
+  contentSafeAreaInset?: TelegramSafeAreaInset
+  onEvent?: (eventType: string, callback: () => void) => void
+  offEvent?: (eventType: string, callback: () => void) => void
+  setHeaderColor?: (color: string) => void
+  setBackgroundColor?: (color: string) => void
+  setBottomBarColor?: (color: string) => void
   openTelegramLink?: (url: string) => void
   openLink?: (url: string) => void
   BackButton?: TelegramBackButton

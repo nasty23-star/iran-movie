@@ -1,49 +1,43 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import AppSidebar from '@/components/AppSidebar.vue'
+import AppTabBar from '@/components/AppTabBar.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import { useFavorites } from '@/composables/useFavorites'
-import { useSidebar } from '@/composables/useSidebar'
 import { useTelegram } from '@/composables/useTelegram'
 import { useTheme } from '@/composables/useTheme'
 
+const route = useRoute()
+const main = ref<HTMLElement | null>(null)
 const { displayName } = useTelegram()
 const { theme, toggleTheme } = useTheme()
 const { savedIds } = useFavorites()
-const { open, toggle, close } = useSidebar()
+
+watch(
+  () => route.fullPath,
+  () => {
+    main.value?.scrollTo({ top: 0 })
+  },
+)
 </script>
 
 <template>
-  <div class="min-h-dvh md:flex">
-    <button
-      v-if="open"
-      type="button"
-      class="fixed inset-0 z-30 bg-black/50 md:hidden"
-      aria-label="Закрыть меню"
-      @click="close"
-    />
-    <aside class="sidebar" :class="{ 'is-open': open }">
-      <AppSidebar :favorite-count="savedIds.length" @navigate="close" />
+  <div class="app-shell">
+    <aside class="sidebar">
+      <AppSidebar :favorite-count="savedIds.length" />
     </aside>
-    <div class="flex min-w-0 flex-1 flex-col">
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col">
       <header
         class="flex items-center justify-between gap-3 border-b border-line px-4 py-3 md:px-8"
       >
-        <div class="flex min-w-0 items-center gap-3">
-          <button
-            type="button"
-            class="btn btn-secondary md:hidden"
-            :aria-expanded="open"
-            @click="toggle"
-          >
-            {{ open ? 'Закрыть' : 'Категории' }}
-          </button>
-          <p class="truncate text-sm text-muted">Здравствуйте, {{ displayName }}</p>
-        </div>
+        <p class="truncate text-sm text-muted">Здравствуйте, {{ displayName }}</p>
         <ThemeToggle :theme="theme" @toggle="toggleTheme" />
       </header>
-      <main class="flex-1 px-4 py-6 md:px-8">
+      <main ref="main" class="shell-main">
         <RouterView />
       </main>
     </div>
+    <AppTabBar :favorite-count="savedIds.length" />
   </div>
 </template>

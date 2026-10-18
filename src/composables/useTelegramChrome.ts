@@ -3,7 +3,7 @@ import type { Ref, ShallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTheme } from '@/composables/useTheme'
 import type { ThemeName } from '@/composables/useTheme'
-import type { TelegramWebApp } from '@/types/telegram'
+import type { TelegramSafeAreaInset, TelegramWebApp } from '@/types/telegram'
 
 export type AppStep = 'entry' | 'intro' | 'app'
 
@@ -25,7 +25,20 @@ const MAIN_COLORS: Record<ThemeName, { color: string; text: string }> = {
   dark: { color: '#78b0e6', text: '#0b1a30' },
 }
 
+const CHROME_COLORS: Record<ThemeName, { header: string; background: string }> = {
+  light: { header: '#e7f2fc', background: '#f5f7f9' },
+  dark: { header: '#07090c', background: '#21262e' },
+}
+
+const SAFE_VARS = [
+  '--app-safe-top',
+  '--app-safe-right',
+  '--app-safe-bottom',
+  '--app-safe-left',
+] as const
+
 let clicksBound = false
+let insetsBound = false
 
 function webApp(): TelegramWebApp | null {
   return window.Telegram?.WebApp ?? null
@@ -54,10 +67,6 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
     router.push({ name: 'home' })
   }
 
-  function goHome() {
-    router.push({ name: 'home' })
-  }
-
   function onBackClick() {
     if (options.step.value === 'intro') {
       options.backToEntry()
@@ -71,11 +80,11 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
       options.enter()
       return
     }
-    if (options.step.value === 'intro') {
-      options.skip()
-      return
-    }
-    if (options.step.value === 'app' && route.name !== 'home') goHome()
+    if (options.step.value === 'intro') options.skip()
+  }
+
+  function onInsetsChanged() {
+    applySafeArea()
   }
 
   function showMain(text: string) {
@@ -104,6 +113,14 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
       clicksBound = true
     }
 
+    paintChrome(app, theme.value)
+    applySafeArea()
+    if (!insetsBound && app.onEvent) {
+      app.onEvent('safeAreaChanged', onInsetsChanged)
+      app.onEvent('contentSafeAreaChanged', onInsetsChanged)
+      insetsBound = true
+    }
+
     const step = options.step.value
     const atHome = step === 'app' && route.name === 'home'
     const showBack = step === 'intro' || (step === 'app' && !atHome)
@@ -118,11 +135,7 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
       showMain('Пропустить')
       return
     }
-    if (atHome) {
-      app.MainButton.hide()
-      return
-    }
-    showMain('На главную')
+    app.MainButton.hide()
   }
 
   sync()
@@ -132,11 +145,54 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
     const app = webApp()
     app?.BackButton?.offClick(onBackClick)
     app?.MainButton?.offClick(onMainClick)
+    if (insetsBound) {
+      app?.offEvent?.('safeAreaChanged', onInsetsChanged)
+      app?.offEvent?.('contentSafeAreaChanged', onInsetsChanged)
+      insetsBound = false
+    }
     app?.BackButton?.hide()
     app?.MainButton?.hide()
     clicksBound = false
     nativeChrome.value = false
+    clearSafeArea()
   })
+}
+
+function paintChrome(app: TelegramWebApp, themeName: ThemeName) {
+  const colors = CHROME_COLORS[themeName]
+  app.setHeaderColor?.(colors.header)
+  app.setBackgroundColor?.(colors.background)
+  app.setBottomBarColor?.(colors.background)
+}
+
+function applySafeArea() {
+  const app = webApp()
+  if (!app || !isTelegramMiniApp(app)) {
+    clearSafeArea()
+    return
+  }
+  const root = document.documentElement
+  root.style.setProperty('--app-safe-top', `${insetSum(app, 'top')}px`)
+  root.style.setProperty('--app-safe-right', `${insetSum(app, 'right')}px`)
+  root.style.setProperty('--app-safe-bottom', `${insetSum(app, 'bottom')}px`)
+  root.style.setProperty('--app-safe-left', `${insetSum(app, 'left')}px`)
+}
+
+function clearSafeArea() {
+  const root = document.documentElement
+  for (const name of SAFE_VARS) root.style.removeProperty(name)
+}
+
+function insetSum(app: TelegramWebApp, side: keyof TelegramSafeAreaInset): number {
+  return readInset(app.safeAreaInset, side) + readInset(app.contentSafeAreaInset, side)
+}
+
+function readInset(
+  inset: TelegramSafeAreaInset | undefined,
+  side: keyof TelegramSafeAreaInset,
+): number {
+  const value = inset?.[side]
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
 }
 
 function hasHistoryBack(): boolean {
