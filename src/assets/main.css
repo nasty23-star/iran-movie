@@ -263,6 +263,17 @@ body {
     color: var(--sidebar-ink);
   }
 
+  .header-mark {
+    width: 1.35rem;
+    height: 1.35rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
   .tab-bar {
     display: flex;
     flex-shrink: 0;

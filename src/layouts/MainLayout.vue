@@ -26,7 +26,14 @@ watch(
       <AppSidebar :favorite-count="savedIds.length" />
     </aside>
     <div class="flex min-h-0 min-w-0 flex-1 flex-col">
-      <header class="flex items-center justify-end border-b border-line px-4 py-3 md:px-8">
+      <header class="flex items-center justify-between gap-3 border-b border-line px-4 py-3 md:px-8">
+        <p class="flex min-w-0 items-center gap-2 text-sm text-muted">
+          <svg class="header-mark" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
+            <path d="M4 9 6.6 4.5h3.1L7.4 9m2.8-4.5h3.2L11 9m2.6-4.5H20L16.2 9" />
+          </svg>
+          <span class="truncate">кино не для всех</span>
+        </p>
         <ThemeToggle :theme="theme" @toggle="toggleTheme" />
       </header>
       <main ref="main" class="shell-main">
