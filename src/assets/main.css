@@ -157,6 +157,42 @@ body {
     background: color-mix(in srgb, var(--danger) 12%, transparent);
   }
 
+  .heart {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .heart:hover {
+    background: var(--surface-2);
+  }
+
+  .heart.is-saved {
+    background: color-mix(in srgb, var(--danger) 14%, transparent);
+    color: var(--danger);
+  }
+
+  .heart-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+
+  .heart.is-saved .heart-icon {
+    fill: currentColor;
+    stroke: none;
+  }
+
   .field {
     display: flex;
     flex-direction: column;
