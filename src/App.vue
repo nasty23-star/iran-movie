@@ -2,15 +2,15 @@
 import { ref } from 'vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import { useTelegram } from '@/composables/useTelegram'
+import { useTelegramChrome } from '@/composables/useTelegramChrome'
+import type { AppStep } from '@/composables/useTelegramChrome'
 import { useTheme } from '@/composables/useTheme'
 import EntryView from '@/views/EntryView.vue'
 import IntroView from '@/views/IntroView.vue'
 
-type Step = 'entry' | 'intro' | 'app'
-
 const { displayName, username } = useTelegram()
 const { theme, toggleTheme } = useTheme()
-const step = ref<Step>('entry')
+const step = ref<AppStep>('entry')
 
 function enter() {
   step.value = 'intro'
@@ -19,6 +19,12 @@ function enter() {
 function skip() {
   step.value = 'app'
 }
+
+function backToEntry() {
+  step.value = 'entry'
+}
+
+useTelegramChrome({ step, enter, skip, backToEntry })
 </script>
 
 <template>

@@ -5,10 +5,12 @@ import FilmCard from '@/components/FilmCard.vue'
 import { useCatalog } from '@/composables/useCatalog'
 import { useExclusions } from '@/composables/useExclusions'
 import { useFavorites } from '@/composables/useFavorites'
+import { useNativeChrome } from '@/composables/useTelegramChrome'
 import { useRoulette } from '@/composables/useRoulette'
 
 const { findById } = useCatalog()
 const { isSaved, toggle } = useFavorites()
+const { nativeChrome } = useNativeChrome()
 const { watchedIds, blockedIds, isWatched, isBlocked, toggleWatched, toggleBlocked } =
   useExclusions()
 const { current, notice, hint, spin } = useRoulette()
@@ -55,7 +57,7 @@ onMounted(() => {
   <section class="mx-auto flex max-w-4xl flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h1 class="font-display text-4xl">рулетка</h1>
-      <BackHome />
+      <BackHome v-if="!nativeChrome" />
     </div>
     <p class="max-w-2xl text-muted">
       Рандом выбирает один фильм. Выбор случайный, но шанс выше у того, что ближе к вашему вкусу.

@@ -4,9 +4,11 @@ import BackHome from '@/components/BackHome.vue'
 import FavoriteRow from '@/components/FavoriteRow.vue'
 import { useCatalog } from '@/composables/useCatalog'
 import { useFavorites } from '@/composables/useFavorites'
+import { useNativeChrome } from '@/composables/useTelegramChrome'
 
 const { findById } = useCatalog()
 const { savedIds, remove, shareFavorites } = useFavorites()
+const { nativeChrome } = useNativeChrome()
 const exported = ref(false)
 const exportFailed = ref(false)
 
@@ -37,7 +39,7 @@ watch(savedIds, () => {
   <section class="mx-auto flex max-w-3xl flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h1 class="font-display text-4xl">избранное</h1>
-      <BackHome />
+      <BackHome v-if="!nativeChrome" />
     </div>
     <div class="flex flex-wrap items-center gap-3">
       <button

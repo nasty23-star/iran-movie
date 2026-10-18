@@ -3,16 +3,18 @@ import BackHome from '@/components/BackHome.vue'
 import FilmCard from '@/components/FilmCard.vue'
 import { useCatalog } from '@/composables/useCatalog'
 import { useFavorites } from '@/composables/useFavorites'
+import { useNativeChrome } from '@/composables/useTelegramChrome'
 
 const { recommendations } = useCatalog()
 const { isSaved, toggle } = useFavorites()
+const { nativeChrome } = useNativeChrome()
 </script>
 
 <template>
   <section class="mx-auto flex max-w-4xl flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h1 class="font-display text-4xl">мой топ фильмов</h1>
-      <BackHome />
+      <BackHome v-if="!nativeChrome" />
     </div>
     <p class="text-muted">
       Мои рекомендации: фильмы, с которых я начинаю разговор об иранском кино.

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import type { ThemeName } from '@/composables/useTheme'
+import { useNativeChrome } from '@/composables/useTelegramChrome'
 
 defineProps<{
   name: string
@@ -12,6 +13,8 @@ const emit = defineEmits<{
   enter: []
   toggleTheme: []
 }>()
+
+const { nativeChrome } = useNativeChrome()
 
 function onEnter() {
   emit('enter')
@@ -36,7 +39,7 @@ function onToggleTheme() {
       <p class="max-w-xl text-lg leading-8 text-muted">
         Мини-приложение Telegram: каталог иранского кино, номинации, личный топ и избранное.
       </p>
-      <div>
+      <div v-if="!nativeChrome">
         <button type="button" class="btn btn-primary" @click="onEnter">Войти</button>
       </div>
     </div>

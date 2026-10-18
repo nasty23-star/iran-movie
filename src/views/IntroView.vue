@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import type { ThemeName } from '@/composables/useTheme'
+import { useNativeChrome } from '@/composables/useTelegramChrome'
 
 defineProps<{
   theme: ThemeName
@@ -10,6 +11,8 @@ const emit = defineEmits<{
   skip: []
   toggleTheme: []
 }>()
+
+const { nativeChrome } = useNativeChrome()
 
 function onSkip() {
   emit('skip')
@@ -37,7 +40,7 @@ function onToggleTheme() {
         Эта школа дважды получала «Оскар» за лучший фильм на иностранном языке и регулярно забирает
         главные призы Канн, Венеции и Берлина. Ограничение здесь не глушит речь, а собирает форму.
       </p>
-      <div>
+      <div v-if="!nativeChrome">
         <button type="button" class="btn btn-primary" @click="onSkip">Пропустить</button>
       </div>
     </div>
