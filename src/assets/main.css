@@ -250,7 +250,7 @@ body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 1.5rem 1rem calc(3.25rem + var(--app-safe-bottom) + 0.75rem);
+    padding: 1.5rem 1rem 1rem;
   }
 
   .sidebar {
@@ -264,12 +264,8 @@ body {
   }
 
   .tab-bar {
-    position: fixed;
-    z-index: 30;
-    right: 0;
-    bottom: 0;
-    left: 0;
     display: flex;
+    flex-shrink: 0;
     border-top: 1px solid var(--line);
     background: var(--surface);
     padding-right: var(--app-safe-right);
@@ -278,20 +274,41 @@ body {
   }
 
   .tab-link {
-    position: relative;
     display: flex;
     min-width: 0;
     flex: 1 1 0;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.15rem;
     min-height: 3.25rem;
-    padding: 0.35rem 0.15rem;
+    padding: 0.35rem 0.1rem 0.45rem;
     color: var(--muted);
-    font-size: clamp(0.62rem, 2.7vw, 0.75rem);
+    font-size: 0.68rem;
     font-weight: 650;
-    line-height: 1.15;
+    line-height: 1.1;
     text-align: center;
     text-decoration: none;
+  }
+
+  .tab-icon-wrap {
+    position: relative;
+    display: flex;
+  }
+
+  .tab-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tab-dot {
+    fill: currentColor;
+    stroke: none;
   }
 
   .tab-link.router-link-exact-active {
@@ -300,14 +317,15 @@ body {
 
   .tab-count {
     position: absolute;
-    top: 0.2rem;
-    right: 0.15rem;
+    top: -0.35rem;
+    right: -0.55rem;
     min-width: 1.1rem;
     border-radius: 999px;
     background: var(--accent-soft);
     color: var(--accent);
     padding: 0.05rem 0.3rem;
     font-size: 0.65rem;
+    line-height: 1.2;
   }
 
   @media (min-width: 768px) {
@@ -326,6 +344,22 @@ body {
     .tab-bar {
       display: none;
     }
+  }
+
+  html[data-tg-mobile] .app-shell {
+    flex-direction: column;
+  }
+
+  html[data-tg-mobile] .shell-main {
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  html[data-tg-mobile] .sidebar {
+    display: none;
+  }
+
+  html[data-tg-mobile] .tab-bar {
+    display: flex;
   }
 
   .nav-link {

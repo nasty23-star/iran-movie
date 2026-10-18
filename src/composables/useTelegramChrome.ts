@@ -105,6 +105,7 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
     const app = webApp()
     const inside = app ? isTelegramMiniApp(app) : false
     nativeChrome.value = inside
+    applyPhoneNav(inside ? app : null)
     if (!inside || !app?.BackButton || !app.MainButton) return
 
     if (!clicksBound) {
@@ -155,6 +156,7 @@ export function useTelegramChrome(options: UseTelegramChromeOptions): void {
     clicksBound = false
     nativeChrome.value = false
     clearSafeArea()
+    applyPhoneNav(null)
   })
 }
 
@@ -181,6 +183,16 @@ function applySafeArea() {
 function clearSafeArea() {
   const root = document.documentElement
   for (const name of SAFE_VARS) root.style.removeProperty(name)
+}
+
+function applyPhoneNav(app: TelegramWebApp | null) {
+  const root = document.documentElement
+  if (app && isPhonePlatform(app.platform)) root.dataset.tgMobile = ''
+  else delete root.dataset.tgMobile
+}
+
+function isPhonePlatform(platform: string): boolean {
+  return platform === 'ios' || platform === 'android' || platform === 'android_x'
 }
 
 function insetSum(app: TelegramWebApp, side: keyof TelegramSafeAreaInset): number {
