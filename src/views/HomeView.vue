@@ -6,7 +6,7 @@ import { useExternalLink } from '@/composables/useExternalLink'
 import { useFavorites } from '@/composables/useFavorites'
 import { useFilmFilters } from '@/composables/useFilmFilters'
 
-const { films, years, directors, genres } = useCatalog()
+const { films, years, genres } = useCatalog()
 const { query, yearFrom, yearTo, director, genre, filtered, reset } = useFilmFilters(films)
 const { isSaved, toggle } = useFavorites()
 const { openExternal } = useExternalLink()
@@ -27,7 +27,6 @@ const { openExternal } = useExternalLink()
       v-model:director="director"
       v-model:genre="genre"
       :years="years"
-      :directors="directors"
       :genres="genres"
       @reset="reset"
     />

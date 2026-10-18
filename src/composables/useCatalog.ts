@@ -8,7 +8,6 @@ export interface UseCatalog {
   films: ShallowRef<Film[]>
   recommendations: ShallowRef<Recommendation[]>
   years: ComputedRef<number[]>
-  directors: ComputedRef<string[]>
   genres: ComputedRef<string[]>
   oscarFilms: ComputedRef<Film[]>
   findById: (id: string) => FilmCardModel | undefined
@@ -135,12 +134,6 @@ export function useCatalog(): UseCatalog {
     [...new Set(films.value.map((film) => film.year))].toSorted((left, right) => right - left),
   )
 
-  const directors = computed(() =>
-    [...new Set(films.value.map((film) => film.director))].toSorted((left, right) =>
-      left.localeCompare(right, 'ru'),
-    ),
-  )
-
   const genres = computed(() =>
     [...new Set(films.value.flatMap((film) => film.genres))].toSorted((left, right) =>
       left.localeCompare(right, 'ru'),
@@ -160,5 +153,5 @@ export function useCatalog(): UseCatalog {
     )
   }
 
-  return { films, recommendations, years, directors, genres, oscarFilms, findById }
+  return { films, recommendations, years, genres, oscarFilms, findById }
 }

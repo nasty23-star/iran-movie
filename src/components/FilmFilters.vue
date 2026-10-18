@@ -9,7 +9,6 @@ const genre = defineModel<string>('genre', { required: true })
 
 const props = defineProps<{
   years: number[]
-  directors: string[]
   genres: string[]
 }>()
 
@@ -71,11 +70,15 @@ watch(yearFrom, (value) => {
       </select>
     </label>
     <label class="field" for="film-director">
-      <span class="field-label">Режиссёр</span>
-      <select id="film-director" v-model="director" class="control">
-        <option value="">Все режиссёры</option>
-        <option v-for="item in directors" :key="item" :value="item">{{ item }}</option>
-      </select>
+      <span class="field-label">Поиск по режиссёру</span>
+      <input
+        id="film-director"
+        v-model="director"
+        class="control"
+        type="search"
+        placeholder="Имя режиссёра"
+        autocomplete="off"
+      />
     </label>
     <label class="field" for="film-genre">
       <span class="field-label">Жанр</span>

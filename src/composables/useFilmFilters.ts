@@ -24,12 +24,13 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
       query.value.trim().length > 0 ||
       yearBound(yearFrom.value) !== null ||
       yearBound(yearTo.value) !== null ||
-      director.value !== '' ||
+      director.value.trim().length > 0 ||
       genre.value !== '',
   )
 
   const filtered = computed(() => {
     const needle = query.value.trim().toLocaleLowerCase('ru')
+    const directorNeedle = director.value.trim().toLocaleLowerCase('ru')
     const period = yearPeriod(yearFrom.value, yearTo.value)
     return toValue(source)
       .filter((film) => {
@@ -38,7 +39,9 @@ export function useFilmFilters(source: MaybeRefOrGetter<Film[]>): UseFilmFilters
         const matchesPeriod =
           (period.from === null || film.year >= period.from) &&
           (period.to === null || film.year <= period.to)
-        const matchesDirector = director.value === '' || film.director === director.value
+        const matchesDirector =
+          directorNeedle.length === 0 ||
+          film.director.toLocaleLowerCase('ru').includes(directorNeedle)
         const matchesGenre = genre.value === '' || film.genres.includes(genre.value)
         return matchesQuery && matchesPeriod && matchesDirector && matchesGenre
       })
