@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import MainLayout from '@/layouts/MainLayout.vue'
+import { useIntroSeen } from '@/composables/useIntroSeen'
 import { useTelegram } from '@/composables/useTelegram'
 import { useTelegramChrome } from '@/composables/useTelegramChrome'
 import type { AppStep } from '@/composables/useTelegramChrome'
@@ -10,13 +11,15 @@ import IntroView from '@/views/IntroView.vue'
 
 const { displayName, username } = useTelegram()
 const { theme, toggleTheme } = useTheme()
-const step = ref<AppStep>('entry')
+const { seen, markSeen } = useIntroSeen()
+const step = ref<AppStep>(seen.value ? 'app' : 'entry')
 
 function enter() {
   step.value = 'intro'
 }
 
 function skip() {
+  markSeen()
   step.value = 'app'
 }
 
